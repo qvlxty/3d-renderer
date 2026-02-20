@@ -21,6 +21,9 @@ add_executable(renderer WIN32 src/main.cpp
         src/Geometry/Vertex.hpp
         src/Geometry/structs/Barycentric.hpp
         src/Geometry/structs/BoundingBox.hpp
+        src/Geometry/Vector3.hpp
+        src/Geometry/Matrix4.hpp
+        src/Geometry/Vector4.hpp
 )
 
 # Link to the actual SDL3 library.

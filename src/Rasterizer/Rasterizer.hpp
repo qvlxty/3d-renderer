@@ -21,7 +21,7 @@ public:
         {
             for (int x = minX; x <= maxX; x++)
             {
-                Vector2*p = new Vector2(x + 0.5f, y + 0.5f);
+                Vector3*p = new Vector3(x + 0.5f, y + 0.5f, 0);
                 auto [w0,w1,w2] = triangle->ComputeBarycentric(*p);
 
                 if ((w0 >= 0 && w1 >= 0 && w2 >= 0) || (w0 <= 0 && w1 <= 0 && w2 <= 0))

@@ -11,6 +11,7 @@ static Sandbox * sandbox = NULL;
 const int WIN_WIDTH = 1280;
 const int WIN_HEIGHT = 720;
 
+
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
     if (!SDL_CreateWindowAndRenderer("Рендер 3D", WIN_WIDTH, WIN_HEIGHT, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
@@ -26,12 +27,12 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
     if (event->type == SDL_EVENT_QUIT) {
         return SDL_APP_SUCCESS;  
     }
+    sandbox->HandleKeys(event);
     return SDL_APP_CONTINUE;
 }
 
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
-
     sandbox->Draw();
     return SDL_APP_CONTINUE;
 }

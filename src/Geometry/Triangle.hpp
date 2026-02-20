@@ -4,7 +4,8 @@
 
 #ifndef RENDERER_TRIANGLE_HPP
 #define RENDERER_TRIANGLE_HPP
-#include "Vector2.hpp"
+#include "Matrix4.hpp"
+#include "Vector3.hpp"
 #include "structs/Barycentric.hpp"
 #include "structs/BoundingBox.hpp"
 
@@ -12,10 +13,10 @@
 class Triangle {
 
 public:
-    Vector2 v0, v1, v2;
-    Triangle(Vector2 p1, Vector2 p2, Vector2 p3): v0(p1), v1(p2), v2(p3) {}
+    Vector3 v0, v1, v2;
+    Triangle(Vector3 p1, Vector3 p2, Vector3 p3): v0(p1), v1(p2), v2(p3) {}
 private:
-    float Edge(const Vector2& a, const Vector2& b, const Vector2& c) const
+    float Edge(const Vector3& a, const Vector3& b, const Vector3& c) const
     {
         return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x);
     }
@@ -30,13 +31,33 @@ public:
         };
     }
 
-    Barycentric ComputeBarycentric(const Vector2& p) const
+    Barycentric ComputeBarycentric(const Vector3& p) const
     {
         return {
             Edge(v1, v2, p),
             Edge(v2, v0, p),
             Edge(v0, v1, p)
         };
+    }
+
+    Vector3 Transform(const Vector3 &v, Matrix4 m)
+    {
+        Vector4 temp(v.x, v.y, v.z, 1.0f);
+        Vector4 result = m * temp;
+
+        return Vector3{
+            result.x,
+            result.y,
+            result.z
+        };
+    }
+    Triangle TransformTriangle(const Matrix4& m)
+    {
+        return Triangle(
+            Transform(this->v0, m),
+            Transform(this->v1, m),
+            Transform(this->v2, m)
+        );
     }
 };
 
