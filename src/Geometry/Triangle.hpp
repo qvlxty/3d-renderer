@@ -40,7 +40,7 @@ public:
         };
     }
 
-    Vector3 Transform(const Vector3 &v, Matrix4 m)
+    static Vector3 Transform(const Vector3 &v, Matrix4 m)
     {
         Vector4 temp(v.x, v.y, v.z, 1.0f);
         Vector4 result = m * temp;
@@ -51,13 +51,34 @@ public:
             result.z
         };
     }
-    Triangle TransformTriangle(const Matrix4& m)
-    {
-        return Triangle(
+    Triangle TransformTriangle(const Matrix4& m) const {
+        return {
             Transform(this->v0, m),
             Transform(this->v1, m),
             Transform(this->v2, m)
-        );
+        };
+    }
+
+    static Vector3 PerspectiveProjection(const Vector3& v, int screenWidth, int screenHeight)
+    {
+        float f = 400.0f;
+
+        float projectedX = (v.x * f) / (v.z + f);
+        float projectedY = (v.y * f) / (v.z + f);
+
+        projectedX += screenWidth / 2.0f;
+        projectedY += screenHeight / 2.0f;
+
+        return { projectedX, projectedY, v.z };
+    }
+
+    Triangle ProjectTriangle(int screenWidth, int screenHeight) const
+    {
+        return {
+            PerspectiveProjection(v0, screenWidth, screenHeight),
+            PerspectiveProjection(v1, screenWidth, screenHeight),
+            PerspectiveProjection(v2, screenWidth, screenHeight)
+        };
     }
 };
 

@@ -17,6 +17,12 @@ public:
     void DrawTriangle(Triangle*triangle, int rColor = 255, int gColor = 128, int bColor = 0) {
         auto [minX, minY, maxX, maxY] = triangle->GetBoundingBox();
 
+        // ToDo: когда поменяем проекцию, эту фикстуру снести лол
+        minX = std::max(0, minX);
+        minY = std::max(0, minY);
+        maxX = std::min(this->renderer->winWidth, maxX);
+        maxY = std::min(this->renderer->winHeight, maxY);
+
         for (int y = minY; y <= maxY; y++)
         {
             for (int x = minX; x <= maxX; x++)

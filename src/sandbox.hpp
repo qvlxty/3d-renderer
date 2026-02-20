@@ -23,34 +23,46 @@ public:
 
     void HandleKeys(SDL_Event *event) {
         if (event->key.key == SDLK_DOWN) {
-            worldYAngle += 3.14 / 180;
+            worldYAngle += 3.14 / 45;
         }
         if (event->key.key == SDLK_UP) {
-            worldYAngle -= 3.14 / 180;
+            worldYAngle -= 3.14 / 45;
         }
+        // помните пи пополам в периоде? а я помню зачем-то, ну завраппим ч
+        if (worldYAngle > 3.14 * 2) {
+            worldYAngle = - 3.14 * 2;
+        }
+        if (worldYAngle < -3.14 * 2) {
+            worldYAngle = 3.14 * 2;
+        }
+        std::cout << worldYAngle << std::endl;
     }
     void Draw() {
         this->renderer->PrepareRender();
 
         // Базованный (не рендерим, будет полигоном)
-        Triangle * baseTriangle = new Triangle(
-                *new Vector3(200, 200,0),
-                *new Vector3(200, 400,0),
-                *new Vector3(400, 600,0)
-            );
+        Triangle baseTriangle(
+             {200, 200, 0},
+             {200, 400, 0},
+             {400, 600, 0}
+         );
 
 
-        // Афиновые  преобразования на результирующую вьюху, хз запашет нет
+        // Афинное  преобразования на результирующую вьюху, хз запашет нет
         Matrix4 rotationMatrix;
         rotationMatrix.RotationY(worldYAngle);
 
         // атас, это вьюха результирующая
-        Triangle transformed = baseTriangle->TransformTriangle(rotationMatrix);
+        Triangle transformed = baseTriangle.TransformTriangle(rotationMatrix);
+
+        Triangle projected = transformed.ProjectTriangle(
+            this->renderer->winWidth,
+            this->renderer->winHeight/2
+            );
 
         // ну всё
-        this->rasterizer->DrawTriangle(&transformed);
+        this->rasterizer->DrawTriangle(&projected);
 
-        delete baseTriangle;
         this->renderer->FlushAndClear();
     }
 };
