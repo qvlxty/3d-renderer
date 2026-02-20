@@ -1,0 +1,27 @@
+cmake_minimum_required(VERSION 3.16)
+project(renderer)
+
+# set the output directory for built objects.
+# This makes sure that the dynamic library goes into the build directory automatically.
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
+
+# This assumes the SDL source is available in vendored/SDL
+add_subdirectory(vendored/SDL EXCLUDE_FROM_ALL)
+set(CMAKE_OSX_ARCHITECTURES "arm64")
+
+# Create your game executable target as usual
+add_executable(renderer WIN32 src/main.cpp
+        src/Geometry/Vector2.hpp
+        src/Geometry/Triangle.hpp
+        src/Renderer/Renderer.cpp
+        src/Renderer/Renderer.hpp
+        src/Rasterizer/Rasterizer.cpp
+        src/Rasterizer/Rasterizer.hpp
+        src/Geometry/Vertex.hpp
+        src/Geometry/structs/Barycentric.hpp
+        src/Geometry/structs/BoundingBox.hpp
+)
+
+# Link to the actual SDL3 library.
+target_link_libraries(renderer PRIVATE SDL3::SDL3)
