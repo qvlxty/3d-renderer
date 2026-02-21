@@ -5,11 +5,15 @@
 #ifndef RENDERER_VERTEX_HPP
 #define RENDERER_VERTEX_HPP
 #include "Vector2.hpp"
+#include "Vector3.hpp"
 
 
 class Vertex {
 public:
-    Vector2 position;
+    Vertex(Vector3 position, Vector2 uv): position(position), uv(uv) {}
+    Vertex(Vector3 position): position(position), uv(Vector2(0,0)) {}
+    Vector3 position;
+    Vector2 uv;
 };
 
 

@@ -4,6 +4,7 @@
 
 #include "Geometry/Matrix4.hpp"
 #include "Geometry/Triangle.hpp"
+#include "Rasterizer/Cube.hpp"
 #include "Rasterizer/Rasterizer.hpp"
 #include "Renderer/Renderer.hpp"
 
@@ -28,40 +29,41 @@ public:
         if (event->key.key == SDLK_UP) {
             worldYAngle -= 3.14 / 45;
         }
-        // помните пи пополам в периоде? а я помню зачем-то, ну завраппим ч
+        // помните два пи в периоде? а я помню зачем-то, ну завраппим ч
         if (worldYAngle > 3.14 * 2) {
             worldYAngle = - 3.14 * 2;
         }
         if (worldYAngle < -3.14 * 2) {
             worldYAngle = 3.14 * 2;
         }
-        std::cout << worldYAngle << std::endl;
     }
     void Draw() {
         this->renderer->PrepareRender();
+        this->rasterizer->ClearZBuffer();
 
-        // Базованный (не рендерим, будет полигоном)
-        Triangle baseTriangle(
-             {200, 200, 0},
-             {200, 400, 0},
-             {400, 600, 0}
-         );
-
+        Cube cube;
 
         // Афинное  преобразования на результирующую вьюху, хз запашет нет
         Matrix4 rotationMatrix;
         rotationMatrix.RotationY(worldYAngle);
 
-        // атас, это вьюха результирующая
-        Triangle transformed = baseTriangle.TransformTriangle(rotationMatrix);
+        // Рендер кубика (пока такой, сорь, но он в норм месте, растерайзер не знаетт ниче про окно)
+        for (Square* square: cube.squares) {
+            Triangle transformed = square->first->TransformTriangle(rotationMatrix);
+            Triangle projected = transformed.ProjectTriangle(
+                this->renderer->winWidth,
+                this->renderer->winHeight/2
+                );
+            this->rasterizer->DrawTriangle(&projected);
 
-        Triangle projected = transformed.ProjectTriangle(
-            this->renderer->winWidth,
-            this->renderer->winHeight/2
-            );
 
-        // ну всё
-        this->rasterizer->DrawTriangle(&projected);
+            Triangle transformedSec = square->second->TransformTriangle(rotationMatrix);
+            Triangle projectedSec = transformedSec.ProjectTriangle(
+                this->renderer->winWidth,
+                this->renderer->winHeight/2
+                );
+            this->rasterizer->DrawTriangle(&projectedSec,255,0,255);
+        }
 
         this->renderer->FlushAndClear();
     }

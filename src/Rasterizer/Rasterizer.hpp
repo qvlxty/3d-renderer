@@ -10,11 +10,19 @@
 
 class Rasterizer {
 private:
-    Renderer* renderer;
-public:
-    Rasterizer(Renderer* renderer): renderer(renderer) {};
+    Renderer *renderer;
 
-    void DrawTriangle(Triangle*triangle, int rColor = 255, int gColor = 128, int bColor = 0) {
+public:
+    Rasterizer(Renderer *renderer) : renderer(renderer), zBuffer(renderer->winHeight * renderer->winWidth) {
+    };
+
+    void ClearZBuffer() {
+        std::fill(zBuffer.begin(), zBuffer.end(), std::numeric_limits<float>::infinity());
+    }
+
+    std::vector<float> zBuffer;
+
+    void DrawTriangle(Triangle *triangle, int rColor = 255, int gColor = 128, int bColor = 0) {
         auto [minX, minY, maxX, maxY] = triangle->GetBoundingBox();
 
         // ToDo: когда поменяем проекцию, эту фикстуру снести лол
@@ -23,18 +31,39 @@ public:
         maxX = std::min(this->renderer->winWidth, maxX);
         maxY = std::min(this->renderer->winHeight, maxY);
 
-        for (int y = minY; y <= maxY; y++)
-        {
-            for (int x = minX; x <= maxX; x++)
-            {
-                Vector3*p = new Vector3(x + 0.5f, y + 0.5f, 0);
-                auto [w0,w1,w2] = triangle->ComputeBarycentric(*p);
+        float area = triangle->area();
+
+        // Нечего рисовать если площадь 0
+        if (area < 0) {
+            return;
+        }
+        float invertArea = 1.0f / area;
+
+        for (int y = minY; y <= maxY; y++) {
+            for (int x = minX; x <= maxX; x++) {
+                Vector3 p = {x + 0.5f, y + 0.5f, 0};
+                auto [w0,w1,w2] = triangle->ComputeBarycentric(p);
+
+                // доп оптимизация чтоб абстрагироваться от того в какую сторону повернуты треугольники
+                // (разные повороты разные знаки в барицентрическ координатах имеют)
+                w0 *= invertArea;
+                w1 *= invertArea;
+                w2 *= invertArea;
+
+                // zbuffer магия
+                float z =
+                        w0 * triangle->v0.position.z +
+                        w1 * triangle->v1.position.z +
+                        w2 * triangle->v2.position.z;
+
+                int index = y * renderer->winWidth + x;
 
                 if ((w0 >= 0 && w1 >= 0 && w2 >= 0) || (w0 <= 0 && w1 <= 0 && w2 <= 0))
-                {
-                    this->renderer->DrawPixel(x, y, rColor, gColor, bColor);
-                }
-                delete p;
+                    // z-buffer sort
+                    if (z < zBuffer[index]) {
+                        zBuffer[index] = z;
+                        this->renderer->DrawPixel(x, y, rColor, gColor, bColor);
+                    }
             }
         }
     }

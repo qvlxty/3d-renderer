@@ -8,8 +8,8 @@ static SDL_Renderer *renderer = NULL;
 
 static Sandbox * sandbox = NULL;
 
-const int WIN_WIDTH = 1280;
-const int WIN_HEIGHT = 720;
+const int WIN_WIDTH = 500;
+const int WIN_HEIGHT = 500;
 
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
