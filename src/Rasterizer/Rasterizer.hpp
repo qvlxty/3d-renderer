@@ -34,9 +34,9 @@ public:
         float area = triangle->area();
 
         // Нечего рисовать если площадь 0
-        if (area < 0) {
-            return;
-        }
+        // if (area < 0) {
+        //     return;
+        // }
         float invertArea = 1.0f / area;
 
         for (int y = minY; y <= maxY; y++) {

@@ -16,7 +16,6 @@ add_executable(renderer WIN32 src/main.cpp
         src/Geometry/Triangle.hpp
         src/Renderer/Renderer.cpp
         src/Renderer/Renderer.hpp
-        src/Rasterizer/Rasterizer.cpp
         src/Rasterizer/Rasterizer.hpp
         src/Geometry/Vertex.hpp
         src/Geometry/structs/Barycentric.hpp
@@ -24,7 +23,6 @@ add_executable(renderer WIN32 src/main.cpp
         src/Geometry/Vector3.hpp
         src/Geometry/Matrix4.hpp
         src/Geometry/Vector4.hpp
-        src/Rasterizer/Cube.cpp
         src/Rasterizer/Cube.hpp
 )
 
